@@ -105,7 +105,7 @@ class Ced_product_List extends WP_List_Table
         global $wpdb;
         $product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $id));
         if ($product_id) {
-            $html = "All Ready Imported";
+            $html = "Already Imported";
         } else {
             $html = "<a href='#' class='button button-primary button-next' id='import_product'  data-productId='$id'>Import</a>";
         }

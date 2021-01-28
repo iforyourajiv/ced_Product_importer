@@ -157,6 +157,7 @@ class Ced_Product_Importer {
 		$this->loader->add_action('admin_menu', $plugin_admin, 'ced_product_importer_page');
 		$this->loader->add_action('wp_ajax_fetch_file', $plugin_admin, 'ced_ShowProductTable');
 		$this->loader->add_action('wp_ajax_import_product', $plugin_admin, 'ced_product_import');
+		$this->loader->add_action('wp_ajax_bulk_import_product', $plugin_admin, 'ced_product_bulk_import');
 
 	}
 

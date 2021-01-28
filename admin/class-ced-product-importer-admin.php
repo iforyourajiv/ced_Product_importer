@@ -201,7 +201,14 @@ class Ced_Product_Importer_Admin
 			'post_status' => 'publish',
 			'post_type' => "product",
 		));
-		wp_set_object_terms($post_id, 'simple', 'product_type');
+
+		if (1 == $data['has_variation']) {
+			$productType = 'variable';
+		} else {
+			$productType = 'simple';
+		}
+		update_post_meta($post_id, '_sku', $data['item_sku']);
+		wp_set_object_terms($post_id, $productType, 'product_type');
 		return $post_id;
 	}
 
@@ -220,11 +227,10 @@ class Ced_Product_Importer_Admin
 		update_post_meta($post_id, '_visibility', 'visible');
 		update_post_meta($post_id, '_regular_price', $data['original_price']);
 		update_post_meta($post_id, '_price', $data['price']);
-		update_post_meta($post_id, '_sku', $data['item_sku']);
 		update_post_meta($post_id, '_manage_stock', 'yes');
 		update_post_meta($post_id, '_backorders', 'no');
 		update_post_meta($post_id, '_stock', $data['stock']);
-		wp_set_object_terms($post_id, 'Clothing', 'category');
+		wp_set_object_terms($post_id, 'clothing', 'product_cat');
 		return true;
 	}
 
@@ -317,6 +323,77 @@ class Ced_Product_Importer_Admin
 	}
 
 
+
+	public function ced_create_attribute_for_variation($data)
+	{
+		foreach ($data as $key => $value) {
+			$attribute = new WC_Product_Attribute();
+			$attribute->set_id($key);
+			$attribute->set_name($value['name']);
+			$attribute->set_options($value['options']);
+			$attribute->set_position(1);
+			$attribute->set_visible(true);
+			$attribute->set_variation(true);
+			return $attribute;
+		}
+	}
+
+
+	public function ced_create_variation($data, $attributes, $post_id)
+	{
+		$parent_id = $post_id;
+		foreach ($data as $key => $value) {
+
+			$variation = array(
+				'post_title'   => $value['name'],
+				'post_content' => $value['name'],
+				'post_status'  => 'publish',
+				'post_parent'  => $parent_id,
+				'post_type'    => 'product_variation'
+			);
+			$variation_id = wp_insert_post($variation);
+			update_post_meta($variation_id, '_sku', $value['variation_sku']);
+			update_post_meta($variation_id, '_visibility', 'visible');
+			update_post_meta($variation_id, '_regular_price', $value['original_price']);
+			update_post_meta($variation_id, '_price', $value['price']);
+			update_post_meta($variation_id, '_manage_stock', 'yes');
+			update_post_meta($variation_id, '_backorders', 'no');
+			update_post_meta($variation_id, '_stock', $value['stock']);
+			$attributeName = $attributes->get_name();
+			$options = $attributes->get_options();
+			$data_attributes[sanitize_title($attributeName)] = array(
+				'name' => wc_clean($attributeName), // set attribute name
+				'value' => 'test', // set attribute value
+				'is_visible' => true,
+				'is_variation' => true,
+				'is_taxonomy' => '0'
+			);
+			update_post_meta($parent_id, '_product_attributes', $data_attributes);
+			foreach ($options as $option) {
+				if ($value['name'] == $option) {
+					update_post_meta($variation_id, 'attribute_' . strtolower($attributeName), $option);
+				}
+			}
+			WC_Product_Variable::sync($parent_id);
+		}
+		return true;
+	}
+
+	/**
+	 * Function : ced_product_import
+	 * Description :  Importing a Product in DB Using Product SKU and Specific File 
+	 * Version:  1.0.0
+	 * @since    1.0.0
+	 * @var $id
+	 * @var $filename
+	 * @var $upload
+	 * @var $upload_dir
+	 * @var $getFileDataForImport
+	 * @var $decodedFileDataForImport
+	 * @var $post_id,$checkattr,$checkImage,$check
+	 * @return void
+	 */
+
 	public function ced_product_import()
 	{
 		$id = $_POST['id'];
@@ -329,8 +406,12 @@ class Ced_Product_Importer_Admin
 		foreach ($decodedFileDataForImport as $element) {
 			if ($element['item']['item_sku'] == $id) {
 				if (1 == $element['item']['has_variation']) {
-					$productType = 'Variable';
-					print_r($element['item']);
+					$post_id = $this->ced_create_simple_product($element['item']);
+					$attributes = $this->ced_create_attribute_for_variation($element['tier_variation']);
+					$check = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
+					if ($check) {
+						echo "Product Imported Successfully";
+					}
 				} else {
 					$post_id = $this->ced_create_simple_product($element['item']);
 					$check = $this->ced_create_product_meta($post_id, $element['item']);
@@ -338,7 +419,53 @@ class Ced_Product_Importer_Admin
 					if ($checkImage) {
 						$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
 						if ($checkattr) {
-							echo "Prdouct Imported Successfuly";
+							echo "Product Imported Successfully";
+						}
+					}
+				}
+			}
+		}
+		wp_die();
+	}
+
+	/**
+	 * Function : ced_product_bulk_import
+	 * Description :  Importing a Bulk Product in DB Using Product SKU and Specific File 
+	 * Version:  1.0.0
+	 * @since    1.0.0
+	 * @var $id
+	 * @var $filename
+	 * @var $upload
+	 * @var $upload_dir
+	 * @var $getFileDataForImport
+	 * @var $decodedFileDataForImport
+	 * @var $post_id,$checkattr,$checkImage,$check
+	 * @return void
+	 */
+
+	public function ced_product_bulk_import()
+	{
+		$bulkId = $_POST['dataForBulk'];
+		$fileName = $_POST['filename'];
+		$upload = wp_upload_dir();
+		$upload_dir = $upload['basedir'];
+		$upload_dir = $upload_dir . '/cedcommerce_product_file/' . $fileName;
+		$getFileDataForImport = file_get_contents($upload_dir);
+		$decodedFileDataForImport = json_decode($getFileDataForImport, true);
+		foreach ($bulkId as $id) {
+			foreach ($decodedFileDataForImport as $element) {
+				if ($element['item']['item_sku'] == $id) {
+					if (1 == $element['item']['has_variation']) {
+						print_r($decodedFileDataForImport);
+					} else {
+						$post_id = $this->ced_create_simple_product($element['item']);
+						$check = $this->ced_create_product_meta($post_id, $element['item']);
+						$checkImage = $this->ced_create_image_for_product($post_id, $element['item']);
+						if ($checkImage) {
+							$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
+							if ($checkattr) {
+								echo "Product Imported Successfuly";
+							}
 						}
 					}
 				}

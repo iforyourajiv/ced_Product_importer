@@ -16,7 +16,7 @@ if (isset($_POST['upload_file'])) {
     if ($_FILES['file']['name'] != '') {
         add_filter('upload_dir', 'change_temp_dir_upload');
         $uploadedfile = $_FILES['file'];
-        if ($uploadedfile['type'] == 'application/json') { // Checking File Type If Json Will Upload  otherwise Return false
+        if ($uploadedfile['type'] == 'application/json') { // Checking File Type If Json,it Will Upload  otherwise Return false
             $overrides = array(
                 'test_form' => false,
             );
