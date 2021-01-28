@@ -52,11 +52,12 @@ class Ced_product_List extends WP_List_Table
     {
         $columns = [
             'cb'      => '<input type="checkbox" />',
-            'name'     =>__('Name'),
-            'item_sku'=>__('SKU'),
-            'price' =>__('Price'),
-            'type' =>__('Type'),
-            'Action'=>__('Action')
+            'images'   => __('Product Image'),
+            'name'     => __('Name'),
+            'item_sku' => __('SKU'),
+            'price' => __('Price'),
+            'type' => __('Type'),
+            'Action' => __('Action')
 
         ];
 
@@ -100,27 +101,32 @@ class Ced_product_List extends WP_List_Table
 
     public function column_default($item, $column_name)
     {
-        $id=$item['item']['item_sku'];
+        $id = $item['item']['item_sku'];
         global $wpdb;
-        $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $id ) );
-        if ( $product_id ){
-            $html="All Ready Imported";
+        $product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $id));
+        if ($product_id) {
+            $html = "All Ready Imported";
         } else {
-            $html="<a href='#' class='button button-primary button-next' id='import_product'  data-productId='$id'>Import</a>";
+            $html = "<a href='#' class='button button-primary button-next' id='import_product'  data-productId='$id'>Import</a>";
         }
         switch ($column_name) {
+            case 'images':
+                return sprintf(
+                    '<img src="%s" style="width:90px; height:50px;"/>',
+                    $item['item']['images'][0]
+                );
             case 'name':
                 return $item['item'][$column_name];
             case 'item_sku':
                 return $item['item'][$column_name];
             case 'price':
                 return $item['item'][$column_name];
-            case 'type' :
-              if($item['item']['has_variation']==1){
-                  return 'Variable';
-              } else {
-                  return 'Simple';
-              }
+            case 'type':
+                if ($item['item']['has_variation'] == 1) {
+                    return 'Variable';
+                } else {
+                    return 'Simple';
+                }
             case 'Action':
                 return $html;
             default:
@@ -162,14 +168,11 @@ class Ced_product_List extends WP_List_Table
      */
     public function prepare_items()
     {
-
-
         $columns               = $this->get_columns();
         $hidden                = array();
         $sortable              = $this->get_sortable_columns();
         $this->_column_headers = array($columns, $hidden, $sortable);
         /** Process bulk action */
         $this->process_bulk_action();
-      
     }
 }
