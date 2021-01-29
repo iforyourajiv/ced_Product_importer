@@ -32,11 +32,11 @@ class Ced_Product_Importer_Activator {
 	public static function activate() {
 
 		// Creating New Folder in WooCommerce_uploads  Having a Name 'cedcommerce_product_file' When Plugin Will be Activated
-		$upload = wp_upload_dir();
+		$upload     = wp_upload_dir();
 		$upload_dir = $upload['basedir'];
 		$upload_dir = $upload_dir . '/cedcommerce_product_file';
 		if (! is_dir($upload_dir)) {
-		   mkdir($upload_dir,755);
+		   mkdir($upload_dir, 755);
 		}
 	}
 

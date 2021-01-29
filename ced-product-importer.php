@@ -38,6 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'CED_PRODUCT_IMPORTER_VERSION', '1.0.0' );
 define('PLUGIN_DIRPATH', plugin_dir_path(__FILE__));
 
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ced-product-importer-activator.php
