@@ -103,7 +103,9 @@ class Ced_Product_Importer_Admin {
 		wp_localize_script(
 			$this->plugin_name,
 			'ajax_fetch_file', //handle Name
-			array('ajaxurl' => admin_url('admin-ajax.php'))
+			array('ajaxurl' => admin_url('admin-ajax.php'),
+				   'nonce' => wp_create_nonce('verify-ajax-call'),
+			)
 		);
 	}
 	/**
@@ -168,16 +170,18 @@ class Ced_Product_Importer_Admin {
 	 */
 	public function ced_ShowProductTable() {
 		require_once PLUGIN_DIRPATH . 'admin/class-showProduct-wp-list-table.php';
-		$obj             = new  Ced_Product_List();
-		$getFilename     = isset($_POST['filename'])?sanitize_text_field( $_POST['filename'] ):false;
-		$upload          = wp_upload_dir();
-		$upload_dir      = $upload['basedir'];
-		$upload_dir      = $upload_dir . '/cedcommerce_product_file/' . $getFilename;
-		$getFileData     = file_get_contents($upload_dir);
-		$decodedFileData = json_decode($getFileData, true);
-		$obj->items      = $decodedFileData;
-		$obj->prepare_items();
-		print_r($obj->display());
+		$obj = new  Ced_Product_List();
+		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
+			$getFilename     = isset($_POST['filename'])?sanitize_text_field( $_POST['filename'] ):false;
+			$upload          = wp_upload_dir();
+			$upload_dir      = $upload['basedir'];
+			$upload_dir      = $upload_dir . '/cedcommerce_product_file/' . $getFilename;
+			$getFileData     = file_get_contents($upload_dir);
+			$decodedFileData = json_decode($getFileData, true);
+			$obj->items      = $decodedFileData;
+			$obj->prepare_items();
+			print_r($obj->display());
+		}
 		wp_die();
 	}
 
@@ -197,7 +201,7 @@ class Ced_Product_Importer_Admin {
 		//Checking if Product is Already Exist or Not
 		$product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $data['item_sku']));
 		if ($product_id) {
-			echo 'Product Already Exist with This ID :-' . $product_id;
+			echo 'failed';
 		} else {
 			$user_id = get_current_user();
 			$post_id = wp_insert_post(array(
@@ -434,37 +438,46 @@ class Ced_Product_Importer_Admin {
 	 */
 
 	public function ced_product_import() {
-		$id                       =isset($_POST['id'])?sanitize_text_field($_POST['id']):false ;
-		$fileName                 = isset($_POST['filename'])? sanitize_text_field( $_POST['filename']):false;
-		$upload                   = wp_upload_dir();
-		$upload_dir               = $upload['basedir'];
-		$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
-		$getFileDataForImport     = file_get_contents($upload_dir);
-		$decodedFileDataForImport = json_decode($getFileDataForImport, true);
-		foreach ($decodedFileDataForImport as $element) {
-			if ($element['item']['item_sku'] == $id) {
-				if (1 == $element['item']['has_variation']) {
-					$post_id          = $this->ced_create_simple_product($element['item']);
-					$checkProductMeta = $this->ced_create_product_meta($post_id, $element['item']);
-					$uploadImage      = $this->ced_create_image_for_product($post_id, $element['item']);
-					$attributes       = $this->ced_create_attribute_for_variation($element['tier_variation']);
-					$check            = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
-					if ($check) {
-						echo 'Product Imported Successfully';
-					}
-				} else {
-					$post_id    = $this->ced_create_simple_product($element['item']);
-					$check      = $this->ced_create_product_meta($post_id, $element['item']);
-					$checkImage = $this->ced_create_image_for_product($post_id, $element['item']);
-					if ($checkImage) {
-						$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
-						if ($checkattr) {
-							echo 'Product Imported Successfully';
+
+		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
+			$id                       =isset($_POST['id'])?sanitize_text_field($_POST['id']):false ;
+			$fileName                 = isset($_POST['filename'])? sanitize_text_field( $_POST['filename']):false;
+			$upload                   = wp_upload_dir();
+			$upload_dir               = $upload['basedir'];
+			$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
+			$getFileDataForImport     = file_get_contents($upload_dir);
+			$decodedFileDataForImport = json_decode($getFileDataForImport, true);
+			foreach ($decodedFileDataForImport as $element) {
+				if ($element['item']['item_sku'] == $id) {
+					if (1 == $element['item']['has_variation']) {
+						$post_id          = $this->ced_create_simple_product($element['item']);
+						$checkProductMeta = $this->ced_create_product_meta($post_id, $element['item']);
+						$uploadImage      = $this->ced_create_image_for_product($post_id, $element['item']);
+						$attributes       = $this->ced_create_attribute_for_variation($element['tier_variation']);
+						$check            = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
+						if ($check) {
+							echo 'success';
+						} else {
+							echo 'failed';
+						}
+					} else {
+						$post_id    = $this->ced_create_simple_product($element['item']);
+						$check      = $this->ced_create_product_meta($post_id, $element['item']);
+						$checkImage = $this->ced_create_image_for_product($post_id, $element['item']);
+						if ($checkImage) {
+							$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
+							if ($checkattr) {
+								echo 'success';
+							} else {
+								echo 'failed';
+							}
 						}
 					}
 				}
 			}
+
 		}
+		
 		wp_die();
 	}
 
@@ -485,6 +498,7 @@ class Ced_Product_Importer_Admin {
 	 */
 
 	public function ced_product_bulk_import() {
+		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
 		$bulkId                   = $_POST['dataForBulk'];
 		$fileName                 = isset($_POST['filename'])?sanitize_text_field($_POST['filename']):false;
 		$upload                   = wp_upload_dir();
@@ -492,30 +506,44 @@ class Ced_Product_Importer_Admin {
 		$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
 		$getFileDataForImport     = file_get_contents($upload_dir);
 		$decodedFileDataForImport = json_decode($getFileDataForImport, true);
-		foreach ($bulkId as $id) {
-			foreach ($decodedFileDataForImport as $element) {
-				if ($element['item']['item_sku'] == $id) {
-					if (1 == $element['item']['has_variation']) {
-						$post_id     = $this->ced_create_simple_product($element['item']);
-						$uploadImage = $this->ced_create_image_for_product($post_id, $element['item']);
-						$attributes  = $this->ced_create_attribute_for_variation($element['tier_variation']);
-						$check       = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
-						if ($check) {
-							echo 'Product Imported Successfully';
-						}
-					} else {
-						$post_id    = $this->ced_create_simple_product($element['item']);
-						$check      = $this->ced_create_product_meta($post_id, $element['item']);
-						$checkImage = $this->ced_create_image_for_product($post_id, $element['item']);
-						if ($checkImage) {
-							$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
-							if ($checkattr) {
-								echo 'Product Imported Successfuly';
+		$checkBulkVariation       =false;
+		$checkBulkSimple          =false;
+			foreach ($bulkId as $id) {
+				foreach ($decodedFileDataForImport as $element) {
+					if ($element['item']['item_sku'] == $id) {
+						if (1 == $element['item']['has_variation']) {
+							$post_id          = $this->ced_create_simple_product($element['item']);
+							$checkProductMeta = $this->ced_create_product_meta($post_id, $element['item']);
+							$uploadImage      = $this->ced_create_image_for_product($post_id, $element['item']);
+							$attributes       = $this->ced_create_attribute_for_variation($element['tier_variation']);
+							$check            = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
+							if ($check) {
+								$checkBulkVariation =true;
+							} else {
+								$checkBulkVariation =false;
+							}
+						} else {
+							$post_id    = $this->ced_create_simple_product($element['item']);
+							$check      = $this->ced_create_product_meta($post_id, $element['item']);
+							$checkImage = $this->ced_create_image_for_product($post_id, $element['item']);
+							if ($checkImage) {
+								$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
+								if ($checkattr) {
+									$checkBulkSimple =true;
+								} else {
+									$checkBulkSimple =false;
+								}
 							}
 						}
 					}
 				}
 			}
+			if ($checkBulkVariation) {
+				echo 'success';
+			}
+			if ($checkBulkSimple) {
+				echo 'success';
+			} 
 		}
 		wp_die();
 	}

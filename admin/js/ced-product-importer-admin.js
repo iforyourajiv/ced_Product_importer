@@ -10,6 +10,7 @@
         type: "POST",
         data: {
           action: "ced_fetch_file",
+          nonce: ajax_fetch_file.nonce,
           filename: filename,
         },
         dataType: "html",
@@ -32,6 +33,7 @@
       type: "POST",
       data: {
         action: "ced_import_product",
+        nonce: ajax_fetch_file.nonce,
         id: id,
         filename: filename,
       },
@@ -40,14 +42,23 @@
       },
       success: function (data) {
         $("#loader").hide();
-        $("#message").append(
-          "<div class='notice is-dismissible notice-success'> <p>" +
-            data +
-            "</p></div>"
-        );
-        setTimeout(function () {
-          $("#message").fadeOut(2000);
-        }, 2000);
+        if('success'== data){
+          $("#message").append(
+            "<div class='notice is-dismissible notice-success'> <p> Product Uploaded Successfully</p></div>"
+          );
+          setTimeout(function () {
+            $("#message").fadeOut(2000);
+          }, 2000);
+        } else {
+          $("#message").append(
+            "<div class='notice is-dismissible notice-error'> <p> Error ! Product Not Uploaded Successfully</p></div>"
+          );
+          setTimeout(function () {
+            $("#message").fadeOut(2000);
+          }, 2000);
+        }
+       
+       
       },
     });
   });
@@ -65,6 +76,7 @@
         type: "POST",
         data: {
           action: "ced_bulk_import_product",
+          nonce: ajax_fetch_file.nonce,
           dataForBulk: dataForBulk,
           filename: filename,
         },
@@ -73,14 +85,21 @@
         },
         success: function (data) {
           $("#loader").hide();
-          $("#message").append(
-            "<div class='notice is-dismissible notice-success'> <p>" +
-              data +
-              "</p></div>"
-          );
-          setTimeout(function () {
-            $("#message").fadeOut(2000);
-          }, 2000);
+          if('success'== data){
+            $("#message").append(
+              "<div class='notice is-dismissible notice-success'> <p> Product Uploaded Successfully</p></div>"
+            );
+            setTimeout(function () {
+              $("#message").fadeOut(2000);
+            }, 2000);
+          } else {
+            $("#message").append(
+              "<div class='notice is-dismissible notice-error'> <p> Error Product Not Uploaded Successfully</p></div>"
+            );
+            setTimeout(function () {
+              $("#message").fadeOut(2000);
+            }, 2000);
+          }
         },
       });
     }
