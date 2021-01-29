@@ -111,6 +111,19 @@ class Ced_Product_List extends WP_List_Table {
 		}
 	}
 
+	/**
+	 * Returns an associative array containing the bulk action
+	 *
+	 * @return array
+	 */
+	public function get_bulk_actions() {
+		$actions = [
+			'bulk-import' => 'Import'
+		];
+
+		return $actions;
+	}
+
 
 	/**
 	 * Handles data query and filter, sorting, and pagination.

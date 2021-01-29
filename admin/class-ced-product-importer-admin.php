@@ -141,11 +141,12 @@ class Ced_Product_Importer_Admin {
 				}
 				?>
 			</select>
-			<div id="displaydata"></div>
 			<div id='loader' style='display: none;'>
 				<h1>Processing.....</h1>
 				<!-- <img src="loading.gif"> -->
 			</div>
+			<div id="displaydata"></div>
+			
 <?php
 
 		}
@@ -484,7 +485,7 @@ class Ced_Product_Importer_Admin {
 	 */
 
 	public function ced_product_bulk_import() {
-		$bulkId                   = isset($_POST['dataForBulk'])?sanitize_text_field( $_POST['dataForBulk'] ):false;
+		$bulkId                   = $_POST['dataForBulk'];
 		$fileName                 = isset($_POST['filename'])?sanitize_text_field($_POST['filename']):false;
 		$upload                   = wp_upload_dir();
 		$upload_dir               = $upload['basedir'];
