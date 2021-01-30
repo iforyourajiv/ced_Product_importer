@@ -477,7 +477,6 @@ class Ced_Product_Importer_Admin {
 			}
 
 		}
-		
 		wp_die();
 	}
 

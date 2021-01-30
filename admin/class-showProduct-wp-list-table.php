@@ -62,20 +62,20 @@ class Ced_Product_List extends WP_List_Table {
 
 
 
-	/**
-	 * Columns to make sortable.
-	 *
-	 * @return array
-	 */
-	public function get_sortable_columns() {
-		$sortable_columns = array(
-			'name' => array('name', true),
-			'price' => array('price', true)
+	// /**
+	//  * Columns to make sortable.
+	//  *
+	//  * @return array
+	//  */
+	// public function get_sortable_columns() {
+	// 	$sortable_columns = array(
+	// 		'name' => array('name', true),
+	// 		'price' => array('price', true)
 
-		);
+	// 	);
 
-		return $sortable_columns;
-	}
+	// 	return $sortable_columns;
+	// }
 
 	public function column_default( $item, $column_name) {
 		$id = $item['item']['item_sku'];

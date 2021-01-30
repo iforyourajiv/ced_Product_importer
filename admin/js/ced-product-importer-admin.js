@@ -57,8 +57,6 @@
             $("#message").fadeOut(2000);
           }, 2000);
         }
-       
-       
       },
     });
   });
@@ -92,6 +90,8 @@
             setTimeout(function () {
               $("#message").fadeOut(2000);
             }, 2000);
+
+            $("#message").$("div").remove();
           } else {
             $("#message").append(
               "<div class='notice is-dismissible notice-error'> <p> Error Product Not Uploaded Successfully</p></div>"
@@ -99,6 +99,7 @@
             setTimeout(function () {
               $("#message").fadeOut(2000);
             }, 2000);
+            $("#message").remove("div");
           }
         },
       });

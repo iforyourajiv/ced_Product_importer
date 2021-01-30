@@ -30,6 +30,9 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+//Checking If Woocommerce is activate or not
+if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
@@ -82,3 +85,10 @@ function run_ced_product_importer() {
 
 }
 run_ced_product_importer();
+
+} else {
+	add_action( 'admin_notices', function() {
+		/* translators: %s WC download URL link. */
+		echo '<div class="error"><p><strong>' . sprintf( esc_html__( 'Product Importer Extension requires the WooCommerce plugin to be installed and active. You can download %s here.', 'ced-product-importer' ), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>' ) . '</strong></p></div>';
+	} );
+}
