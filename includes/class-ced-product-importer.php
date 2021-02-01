@@ -155,10 +155,11 @@ class Ced_Product_Importer {
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 		$this->loader->add_action('admin_menu', $plugin_admin, 'ced_product_importer_page');
+		$this->loader->add_action('admin_menu', $plugin_admin, 'ced_order_importer_page');
 		$this->loader->add_action('wp_ajax_ced_fetch_file', $plugin_admin, 'ced_ShowProductTable');
 		$this->loader->add_action('wp_ajax_ced_import_product', $plugin_admin, 'ced_product_import');
 		$this->loader->add_action('wp_ajax_ced_bulk_import_product', $plugin_admin, 'ced_product_bulk_import');
-
+		$this->loader->add_action('wp_ajax_ced_fetch_order_file', $plugin_admin, 'ced_create_order');
 	}
 
 	/**

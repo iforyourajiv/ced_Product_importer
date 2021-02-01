@@ -20,7 +20,8 @@
  * @subpackage Ced_Product_Importer/admin
  * 
  */
-class Ced_Product_Importer_Admin {
+class Ced_Product_Importer_Admin
+{
 
 
 
@@ -49,7 +50,8 @@ class Ced_Product_Importer_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version) {
+	public function __construct($plugin_name, $version)
+	{
 		global $hook_suffix;
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -63,7 +65,8 @@ class Ced_Product_Importer_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -85,7 +88,8 @@ class Ced_Product_Importer_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -103,8 +107,9 @@ class Ced_Product_Importer_Admin {
 		wp_localize_script(
 			$this->plugin_name,
 			'ajax_fetch_file', //handle Name
-			array('ajaxurl' => admin_url('admin-ajax.php'),
-				   'nonce' => wp_create_nonce('verify-ajax-call'),
+			array(
+				'ajaxurl' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('verify-ajax-call'),
 			)
 		);
 	}
@@ -116,7 +121,8 @@ class Ced_Product_Importer_Admin {
 	 * @since    1.0.0
 	 * @return void
 	 */
-	public function ced_product_importer_page() {
+	public function ced_product_importer_page()
+	{
 		add_menu_page(
 			'Product Importer', // Menu Title
 			'Import Product', // Menu Name
@@ -127,17 +133,17 @@ class Ced_Product_Importer_Admin {
 			30
 		);
 
-		function ced_import_product_html() {
+		function ced_import_product_html()
+		{
 			include PLUGIN_DIRPATH . '/admin/uploadfile.php';
-
 			$getFile = get_option('uploaded_product_file', 1);
-			?>
+?>
 			<label> <b>Select File For Displaying a Product</b></label>
 			<select name='fileSelection' id='fileSelection'>
 				<option value="">Select a File</option>
 				<?php
 				foreach ($getFile as $filename) {
-					?>
+				?>
 					<option value="<?php echo esc_html($filename); ?>"><?php echo esc_html($filename); ?></option>
 				<?php
 				}
@@ -145,11 +151,10 @@ class Ced_Product_Importer_Admin {
 			</select>
 			<div id='loader' style='display: none;'>
 				<h1>Processing.....</h1>
-				<!-- <img src="loading.gif"> -->
 			</div>
 			<div id="displaydata"></div>
-			
-<?php
+
+		<?php
 
 		}
 	}
@@ -168,11 +173,12 @@ class Ced_Product_Importer_Admin {
 	 * @var $decodedFileData //Decoding Data From JSON to Array
 	 * @return void
 	 */
-	public function ced_ShowProductTable() {
+	public function ced_ShowProductTable()
+	{
 		require_once PLUGIN_DIRPATH . 'admin/class-showProduct-wp-list-table.php';
 		$obj = new  Ced_Product_List();
-		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
-			$getFilename     = isset($_POST['filename'])?sanitize_text_field( $_POST['filename'] ):false;
+		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
+			$getFilename     = isset($_POST['filename']) ? sanitize_text_field($_POST['filename']) : false;
 			$upload          = wp_upload_dir();
 			$upload_dir      = $upload['basedir'];
 			$upload_dir      = $upload_dir . '/cedcommerce_product_file/' . $getFilename;
@@ -196,7 +202,8 @@ class Ced_Product_Importer_Admin {
 	 * @var $post_id
 	 * @return $post_id
 	 */
-	public function ced_create_simple_product( $data) {
+	public function ced_create_simple_product($data)
+	{
 		global $wpdb;
 		//Checking if Product is Already Exist or Not
 		$product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $data['item_sku']));
@@ -234,7 +241,8 @@ class Ced_Product_Importer_Admin {
 	 * @param $post_id,$data
 	 * @return true
 	 */
-	public function ced_create_product_meta( $post_id, $data) {
+	public function ced_create_product_meta($post_id, $data)
+	{
 		update_post_meta($post_id, '_visibility', 'visible');
 		update_post_meta($post_id, '_regular_price', $data['original_price']);
 		update_post_meta($post_id, '_price', $data['price']);
@@ -262,7 +270,8 @@ class Ced_Product_Importer_Admin {
 	 * @return true
 	 */
 
-	public function ced_create_image_for_product( $post_id, $data) {
+	public function ced_create_image_for_product($post_id, $data)
+	{
 		foreach ($data['images'] as $key => $value) {
 			// Add Featured Image to Post
 			$image_url        = $value; // Define the image URL here
@@ -315,7 +324,8 @@ class Ced_Product_Importer_Admin {
 	 * @var $varation_no
 	 * @return true
 	 */
-	public function ced_create_product_attributes( $post_id, $data) {
+	public function ced_create_product_attributes($post_id, $data)
+	{
 		$i                  = 0;
 		$product_attributes = array();
 		foreach ($data['attributes'] as $key => $value) {
@@ -349,7 +359,8 @@ class Ced_Product_Importer_Admin {
 	 * @param  mixed $data
 	 * @return $attribute
 	 */
-	public function ced_create_attribute_for_variation( $data) {
+	public function ced_create_attribute_for_variation($data)
+	{
 		foreach ($data as $key => $value) {
 			$attribute = new WC_Product_Attribute();
 			$attribute->set_id($key);
@@ -380,7 +391,8 @@ class Ced_Product_Importer_Admin {
 	 * @var $variation_id
 	 * @return true
 	 */
-	public function ced_create_variation( $data, $attributes, $post_id) {
+	public function ced_create_variation($data, $attributes, $post_id)
+	{
 		$parent_id     = $post_id;
 		$attributeName = $attributes->get_name();
 		$options       = $attributes->get_options();
@@ -423,7 +435,7 @@ class Ced_Product_Importer_Admin {
 
 	/**
 	 * Function : ced_product_import
-	 * Description :  Importing a Product (Simple ,Variable) in DB Using Product SKU and Specific File 
+	 * Description :  Importing a Product (Simple ,Variable) in DB Using Product SKU and Specific File
 	 * Version:  1.0.0
 	 *
 	 * @since    1.0.0
@@ -437,11 +449,12 @@ class Ced_Product_Importer_Admin {
 	 * @return void
 	 */
 
-	public function ced_product_import() {
+	public function ced_product_import()
+	{
 
-		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
-			$id                       =isset($_POST['id'])?sanitize_text_field($_POST['id']):false ;
-			$fileName                 = isset($_POST['filename'])? sanitize_text_field( $_POST['filename']):false;
+		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
+			$id                       = isset($_POST['id']) ? sanitize_text_field($_POST['id']) : false;
+			$fileName                 = isset($_POST['filename']) ? sanitize_text_field($_POST['filename']) : false;
 			$upload                   = wp_upload_dir();
 			$upload_dir               = $upload['basedir'];
 			$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
@@ -475,7 +488,6 @@ class Ced_Product_Importer_Admin {
 					}
 				}
 			}
-
 		}
 		wp_die();
 	}
@@ -496,17 +508,18 @@ class Ced_Product_Importer_Admin {
 	 * @return void
 	 */
 
-	public function ced_product_bulk_import() {
-		if ( check_ajax_referer( 'verify-ajax-call', 'nonce' ) ) {
-		$bulkId                   = $_POST['dataForBulk'];
-		$fileName                 = isset($_POST['filename'])?sanitize_text_field($_POST['filename']):false;
-		$upload                   = wp_upload_dir();
-		$upload_dir               = $upload['basedir'];
-		$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
-		$getFileDataForImport     = file_get_contents($upload_dir);
-		$decodedFileDataForImport = json_decode($getFileDataForImport, true);
-		$checkBulkVariation       =false;
-		$checkBulkSimple          =false;
+	public function ced_product_bulk_import()
+	{
+		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
+			$bulkId                   = $_POST['dataForBulk'];
+			$fileName                 = isset($_POST['filename']) ? sanitize_text_field($_POST['filename']) : false;
+			$upload                   = wp_upload_dir();
+			$upload_dir               = $upload['basedir'];
+			$upload_dir               = $upload_dir . '/cedcommerce_product_file/' . $fileName;
+			$getFileDataForImport     = file_get_contents($upload_dir);
+			$decodedFileDataForImport = json_decode($getFileDataForImport, true);
+			$checkBulkVariation       = false;
+			$checkBulkSimple          = false;
 			foreach ($bulkId as $id) {
 				foreach ($decodedFileDataForImport as $element) {
 					if ($element['item']['item_sku'] == $id) {
@@ -517,9 +530,9 @@ class Ced_Product_Importer_Admin {
 							$attributes       = $this->ced_create_attribute_for_variation($element['tier_variation']);
 							$check            = $this->ced_create_variation($element['item']['variations'], $attributes, $post_id);
 							if ($check) {
-								$checkBulkVariation =true;
+								$checkBulkVariation = true;
 							} else {
-								$checkBulkVariation =false;
+								$checkBulkVariation = false;
 							}
 						} else {
 							$post_id    = $this->ced_create_simple_product($element['item']);
@@ -528,9 +541,9 @@ class Ced_Product_Importer_Admin {
 							if ($checkImage) {
 								$checkattr = $this->ced_create_product_attributes($post_id, $element['item']);
 								if ($checkattr) {
-									$checkBulkSimple =true;
+									$checkBulkSimple = true;
 								} else {
-									$checkBulkSimple =false;
+									$checkBulkSimple = false;
 								}
 							}
 						}
@@ -542,7 +555,221 @@ class Ced_Product_Importer_Admin {
 			}
 			if ($checkBulkSimple) {
 				echo 'success';
-			} 
+			}
+		}
+		wp_die();
+	}
+
+	/**
+	 * Function: ced_order_importer
+	 * Description : Creating New Menu Having a name 'Import Order' For Importing a File for creating a Order
+	 * Version:1.0.0
+	 *
+	 * @since    1.0.0
+	 * @return void
+	 */
+	public function ced_Order_importer_page()
+	{
+		add_menu_page(
+			'Order Importer', // Menu Title
+			'Import Orders', // Menu Name
+			'manage_woocommerce', //Capabilities
+			'import-order', //Slug
+			'ced_import_order_html', // call backFunction
+			'dashicons-upload', //Icon
+			30
+		);
+
+		function ced_import_order_html()
+		{
+			include PLUGIN_DIRPATH . '/admin/upload-order.php';
+			$getFile = get_option('uploaded_order_file', 1);
+		?>
+			<label> <b>Select File For Creating A order</b></label>
+			<select name='fileSelection_for_order' id='fileSelection_for_order'>
+				<option value="">Select a File</option>
+				<?php
+				foreach ($getFile as $filename) {
+				?>
+					<option value="<?php echo esc_html($filename); ?>"><?php echo esc_html($filename); ?></option>
+				<?php
+				}
+				?>
+			</select>
+			<button class="button button-primary button-next" id="ced_create_order">Create Order</button>
+			<div id='loader' style='display: none;'>
+				<h1>Processing.....</h1>
+			</div>
+<?php
+
+		}
+	}
+
+	/**
+	 * ced_get_sku
+	 *
+	 * @param  mixed $data
+	 * @return void
+	 */
+	public function ced_get_sku($data)
+	{
+		$sku = '';
+		foreach ($data as $elements => $element) {
+			$sku = $element['Item']['SKU'];
+		}
+		return $sku;
+	}
+
+	/**
+	 * ced_get_qty
+	 *
+	 * @param  mixed $data
+	 * @return void
+	 */
+	public function ced_get_qty($data)
+	{
+		foreach ($data as $elements => $element) {
+			$qty = $element['QuantityPurchased'];
+		}
+		return $qty;
+	}
+
+	/**
+	 * Function : fetch_shipping_address_for_order
+	 *
+	 * @param  mixed $data
+	 * @return $shippingAddress
+	 */
+	public function ced_fetch_shipping_address_for_order($data)
+	{
+		$shippingAddress = array(
+			'first_name' => $data['Name'],
+			'address_1' => $data['Street1'],
+			'city' => $data['CityName'],
+			'state' => $data['StateOrProvince'],
+			'postcode' => $data['PostalCode'],
+			'country' => $data['Country'],
+		);
+		return $shippingAddress;
+	}
+
+	
+	/**
+	 * ced_fetch_billing_address_for_order
+	 *
+	 * @param  mixed $data
+	 * @return void
+	 */
+	public function ced_fetch_billing_address_for_order($data){
+		$billingAddress = array(
+			'first_name' => $data['Name'],
+			'address_1' => $data['Street1'],
+			'city' => $data['CityName'],
+			'state' => $data['StateOrProvince'],
+			'postcode' => $data['PostalCode'],
+			'country' => $data['Country'],
+		);
+		return $billingAddress;
+	}
+
+	
+	/**
+	 * ced_get_shipping_title
+	 *
+	 * @param  mixed $data
+	 * @return void
+	 */
+	public function ced_get_shipping_title($data){
+		$shippingMethodTitle=$data['ShippingService'];
+		return $shippingMethodTitle;
+	}
+
+	
+	/**
+	 * ced_get_shipping_cost
+	 *
+	 * @param  mixed $data
+	 * @return void
+	 */
+	public function ced_get_shipping_cost($data){
+		foreach($data as $elements=>$element){
+			$shippingMethodCost=$element['value'];
+			
+		}
+		return $shippingMethodCost;
+	}
+
+
+	// /**
+	//  * Function :ced_get_tax
+	//  *
+	//  * @param  mixed $data
+	//  * @return void
+	//  */
+	// public function fetch_total_tax_for_order($data){
+	// 	$tax_total='0';
+	// 	foreach($data as $elements=>$element){
+	// 	$tax_total=$element['Taxes']['TotalTaxAmount']['value'];
+	// 	}
+	// 	return $tax_total;
+	// }
+
+
+	/**
+	 * Function :ced_create_order
+	 *
+	 * @return void
+	 */
+	public function ced_create_order()
+	{
+		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
+			$orderfileName             = isset($_POST['orderfilename']) ? sanitize_text_field($_POST['orderfilename']) : false;
+			$upload                   = wp_upload_dir();
+			$upload_dir               = $upload['basedir'];
+			$upload_dir               = $upload_dir . '/cedcommerce_order_file/' . $orderfileName;
+			$getOrderFileDataForImport     = file_get_contents($upload_dir);
+			$decodedOrderFileDataForImport = json_decode($getOrderFileDataForImport, true);
+			$products_to_add = array();
+			foreach ($decodedOrderFileDataForImport as $elements => $element) {
+				foreach ($element as $values => $value) {
+					foreach ($value as $data) {
+						$user_id=$data['BuyerUserID'];
+						$args = array(
+							'customer_id'   => $user_id,
+							'status'        => 'Processing',
+							'customer_note' => 'Your order is on Processing.',
+							'order_id'      => $data['OrderID'],
+						);
+						$new_order = wc_create_order($args);
+						$sku = $this->ced_get_sku($data['TransactionArray']['Transaction']);
+						$id = wc_get_product_id_by_sku($sku);
+						$product = wc_get_product($id);
+						if ($id) {
+							$products_to_add[$product->get_id()] = $this->ced_get_qty($data['TransactionArray']['Transaction']);
+						} else {
+							//Create Product
+						}
+						foreach ($products_to_add as $product => $qty) {
+							$new_order->add_product(wc_get_product($product), $qty);
+						}
+						$date_time = new WC_DateTime();
+						$addShipping = new WC_Order_Item_Shipping();
+						$shippingAddress = $this->ced_fetch_shipping_address_for_order($data['ShippingAddress']);
+						$billingAddress=$this->ced_fetch_billing_address_for_order($data['ShippingAddress']);
+						$getShippingTitle=$this->ced_get_shipping_title($data['ShippingServiceSelected']);
+						$getShippingCost=$this->ced_get_shipping_cost($data['ShippingServiceSelected']);
+						$new_order->set_date_created($date_time);
+						$new_order->set_address($shippingAddress, 'shipping');
+						$new_order->set_address( $billingAddress, 'billing' );
+						$new_order->set_currency($data['Total']['currencyID']);
+						$addShipping->set_method_title($getShippingTitle);
+						$addShipping->set_total($getShippingCost);
+						$new_order->add_item($addShipping);
+						$new_order->calculate_totals();
+						$new_order->save();
+					}
+				}
+			}
 		}
 		wp_die();
 	}

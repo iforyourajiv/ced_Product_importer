@@ -1,7 +1,7 @@
 (function ($) {
   "use strict";
 
-  //Getting Dropdon value to Show Wp_list Table according to File Type
+  //Getting Dropdown value to Show Wp_list Table according to File Type
   $(document).ready(function () {
     $("#fileSelection").change(function () {
       var filename = $(this).val();
@@ -20,6 +20,30 @@
         success: function (data) {
           $("#displaydata").html(data);
           $("#loader").hide();
+        },
+      });
+    });
+
+
+
+//Getting Selected Dropdown value to Create Order With Selected File
+    $("#ced_create_order").click(function () {
+      var orderfilename = $("#fileSelection_for_order").val();
+      $.ajax({
+        url: ajax_fetch_file.ajaxurl,
+        type: "POST",
+        data: {
+          action: "ced_fetch_order_file",
+          nonce: ajax_fetch_file.nonce,
+          orderfilename: orderfilename,
+        },
+        dataType: "html",
+        beforeSend: function () {
+          $("#loader").show();
+        },
+        success: function (data) {
+          $("#loader").hide();
+          console.log(data);
         },
       });
     });
@@ -42,6 +66,7 @@
       },
       success: function (data) {
         $("#loader").hide();
+        $(".button"+id).text("Already Imported");
         if('success'== data){
           $("#message").append(
             "<div class='notice is-dismissible notice-success'> <p> Product Uploaded Successfully</p></div>"
@@ -105,4 +130,9 @@
       });
     }
   });
+
+
+  
+
+
 })(jQuery);
