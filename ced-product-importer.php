@@ -46,19 +46,19 @@ define('PLUGIN_DIRPATH', plugin_dir_path(__FILE__));
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ced-product-importer-activator.php
  */
-function activate_ced_product_importer() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ced-product-importer-activator.php';
-	Ced_Product_Importer_Activator::activate();
-}
+	function activate_ced_product_importer() {
+		require_once plugin_dir_path( __FILE__ ) . 'includes/class-ced-product-importer-activator.php';
+		Ced_Product_Importer_Activator::activate();
+	}
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-ced-product-importer-deactivator.php
  */
-function deactivate_ced_product_importer() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ced-product-importer-deactivator.php';
-	Ced_Product_Importer_Deactivator::deactivate();
-}
+	function deactivate_ced_product_importer() {
+		require_once plugin_dir_path( __FILE__ ) . 'includes/class-ced-product-importer-deactivator.php';
+		Ced_Product_Importer_Deactivator::deactivate();
+	}
 
 register_activation_hook( __FILE__, 'activate_ced_product_importer' );
 register_deactivation_hook( __FILE__, 'deactivate_ced_product_importer' );
@@ -78,12 +78,12 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-ced-product-importer.php';
  *
  * @since    1.0.0
  */
-function run_ced_product_importer() {
+	function run_ced_product_importer() {
 
-	$plugin = new Ced_Product_Importer();
-	$plugin->run();
+		$plugin = new Ced_Product_Importer();
+		$plugin->run();
 
-}
+	}
 run_ced_product_importer();
 
 } else {

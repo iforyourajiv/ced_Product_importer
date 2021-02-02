@@ -19,7 +19,7 @@ if (isset($_POST['upload_order_file'])) {
 			$upload       = wp_upload_dir();
 			$upload_dir   = $upload['basedir'];
 			$upload_dir   = $upload_dir . '/cedcommerce_order_file/' . $uploadedfile['name'];
-            $getFile      =			 @file_get_contents($upload_dir);
+			$getFile      =			 @file_get_contents($upload_dir);
 			if (  false !== $getFile) {
 				echo '<div class="notice is-dismissible notice-error">
 						<p>File Already Exist</p>

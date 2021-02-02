@@ -43,7 +43,12 @@
         },
         success: function (data) {
           $("#loader").hide();
-          console.log(data);
+          $("#messagefororder").append(
+            "<div class='notice is-dismissible notice-success'> <p>"+data+"</p></div>"
+          );
+          setTimeout(function () {
+            $("#messagefororder").fadeOut(2000);
+          }, 2000);
         },
       });
     });

@@ -15,17 +15,17 @@
 
 
 .uploadbtn{
-    font-size: 1em;
-    padding: .5em 1em!important;
-    line-height: 1.5em!important;
-    margin-bottom: 2px;
-    color: white;
-    height: auto!important;
-    border-radius: 30px;
-    background-color: #bb77ae;
-    border-color: #a36597;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 0 #a36597;
-    text-shadow: 0 -1px 1px #a36597, 1px 0 1px #a36597, 0 1px 1px #a36597, -1px 0 1px #a36597;
-    margin: 0;
-    opacity: 1;
+	font-size: 1em;
+	padding: .5em 1em!important;
+	line-height: 1.5em!important;
+	margin-bottom: 2px;
+	color: white;
+	height: auto!important;
+	border-radius: 30px;
+	background-color: #bb77ae;
+	border-color: #a36597;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 1px 0 #a36597;
+	text-shadow: 0 -1px 1px #a36597, 1px 0 1px #a36597, 0 1px 1px #a36597, -1px 0 1px #a36597;
+	margin: 0;
+	opacity: 1;
 }

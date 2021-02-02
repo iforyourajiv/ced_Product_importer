@@ -20,8 +20,8 @@
  * @subpackage Ced_Product_Importer/admin
  * 
  */
-class Ced_Product_Importer_Admin
-{
+class Ced_Product_Importer_Admin {
+
 
 
 
@@ -50,8 +50,7 @@ class Ced_Product_Importer_Admin
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version)
-	{
+	public function __construct( $plugin_name, $version) {
 		global $hook_suffix;
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
@@ -65,8 +64,7 @@ class Ced_Product_Importer_Admin
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles()
-	{
+	public function enqueue_styles() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -88,8 +86,7 @@ class Ced_Product_Importer_Admin
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts()
-	{
+	public function enqueue_scripts() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -121,8 +118,7 @@ class Ced_Product_Importer_Admin
 	 * @since    1.0.0
 	 * @return void
 	 */
-	public function ced_product_importer_page()
-	{
+	public function ced_product_importer_page() {
 		add_menu_page(
 			'Product Importer', // Menu Title
 			'Import Product', // Menu Name
@@ -133,17 +129,16 @@ class Ced_Product_Importer_Admin
 			30
 		);
 
-		function ced_import_product_html()
-		{
+		function ced_import_product_html() {
 			include PLUGIN_DIRPATH . '/admin/uploadfile.php';
 			$getFile = get_option('uploaded_product_file', 1);
-?>
+			?>
 			<label> <b>Select File For Displaying a Product</b></label>
 			<select name='fileSelection' id='fileSelection'>
 				<option value="">Select a File</option>
 				<?php
 				foreach ($getFile as $filename) {
-				?>
+					?>
 					<option value="<?php echo esc_html($filename); ?>"><?php echo esc_html($filename); ?></option>
 				<?php
 				}
@@ -173,8 +168,7 @@ class Ced_Product_Importer_Admin
 	 * @var $decodedFileData //Decoding Data From JSON to Array
 	 * @return void
 	 */
-	public function ced_ShowProductTable()
-	{
+	public function ced_ShowProductTable() {
 		require_once PLUGIN_DIRPATH . 'admin/class-showProduct-wp-list-table.php';
 		$obj = new  Ced_Product_List();
 		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
@@ -202,8 +196,7 @@ class Ced_Product_Importer_Admin
 	 * @var $post_id
 	 * @return $post_id
 	 */
-	public function ced_create_simple_product($data)
-	{
+	public function ced_create_simple_product( $data) {
 		global $wpdb;
 		//Checking if Product is Already Exist or Not
 		$product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $data['item_sku']));
@@ -241,8 +234,7 @@ class Ced_Product_Importer_Admin
 	 * @param $post_id,$data
 	 * @return true
 	 */
-	public function ced_create_product_meta($post_id, $data)
-	{
+	public function ced_create_product_meta( $post_id, $data) {
 		update_post_meta($post_id, '_visibility', 'visible');
 		update_post_meta($post_id, '_regular_price', $data['original_price']);
 		update_post_meta($post_id, '_price', $data['price']);
@@ -270,8 +262,7 @@ class Ced_Product_Importer_Admin
 	 * @return true
 	 */
 
-	public function ced_create_image_for_product($post_id, $data)
-	{
+	public function ced_create_image_for_product( $post_id, $data) {
 		foreach ($data['images'] as $key => $value) {
 			// Add Featured Image to Post
 			$image_url        = $value; // Define the image URL here
@@ -324,8 +315,7 @@ class Ced_Product_Importer_Admin
 	 * @var $varation_no
 	 * @return true
 	 */
-	public function ced_create_product_attributes($post_id, $data)
-	{
+	public function ced_create_product_attributes( $post_id, $data) {
 		$i                  = 0;
 		$product_attributes = array();
 		foreach ($data['attributes'] as $key => $value) {
@@ -359,8 +349,7 @@ class Ced_Product_Importer_Admin
 	 * @param  mixed $data
 	 * @return $attribute
 	 */
-	public function ced_create_attribute_for_variation($data)
-	{
+	public function ced_create_attribute_for_variation( $data) {
 		foreach ($data as $key => $value) {
 			$attribute = new WC_Product_Attribute();
 			$attribute->set_id($key);
@@ -391,8 +380,7 @@ class Ced_Product_Importer_Admin
 	 * @var $variation_id
 	 * @return true
 	 */
-	public function ced_create_variation($data, $attributes, $post_id)
-	{
+	public function ced_create_variation( $data, $attributes, $post_id) {
 		$parent_id     = $post_id;
 		$attributeName = $attributes->get_name();
 		$options       = $attributes->get_options();
@@ -449,8 +437,7 @@ class Ced_Product_Importer_Admin
 	 * @return void
 	 */
 
-	public function ced_product_import()
-	{
+	public function ced_product_import() {
 
 		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
 			$id                       = isset($_POST['id']) ? sanitize_text_field($_POST['id']) : false;
@@ -508,8 +495,7 @@ class Ced_Product_Importer_Admin
 	 * @return void
 	 */
 
-	public function ced_product_bulk_import()
-	{
+	public function ced_product_bulk_import() {
 		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
 			$bulkId                   = $_POST['dataForBulk'];
 			$fileName                 = isset($_POST['filename']) ? sanitize_text_field($_POST['filename']) : false;
@@ -568,8 +554,7 @@ class Ced_Product_Importer_Admin
 	 * @since    1.0.0
 	 * @return void
 	 */
-	public function ced_Order_importer_page()
-	{
+	public function ced_Order_importer_page() {
 		add_menu_page(
 			'Order Importer', // Menu Title
 			'Import Orders', // Menu Name
@@ -580,17 +565,16 @@ class Ced_Product_Importer_Admin
 			30
 		);
 
-		function ced_import_order_html()
-		{
+		function ced_import_order_html() {
 			include PLUGIN_DIRPATH . '/admin/upload-order.php';
 			$getFile = get_option('uploaded_order_file', 1);
-		?>
+			?>
 			<label> <b>Select File For Creating A order</b></label>
 			<select name='fileSelection_for_order' id='fileSelection_for_order'>
 				<option value="">Select a File</option>
 				<?php
 				foreach ($getFile as $filename) {
-				?>
+					?>
 					<option value="<?php echo esc_html($filename); ?>"><?php echo esc_html($filename); ?></option>
 				<?php
 				}
@@ -600,19 +584,25 @@ class Ced_Product_Importer_Admin
 			<div id='loader' style='display: none;'>
 				<h1>Processing.....</h1>
 			</div>
+
+			<div id='messagefororder'>
+			</div>
 <?php
 
 		}
 	}
 
 	/**
-	 * ced_get_sku
+	 * Function : ced_get_sku
+	 * Description : Fetching SKU of Product for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
-	 * @return void
+	 * @var $sku
+	 * @return $sku
 	 */
-	public function ced_get_sku($data)
-	{
+	public function ced_get_sku( $data) {
 		$sku = '';
 		foreach ($data as $elements => $element) {
 			$sku = $element['Item']['SKU'];
@@ -621,13 +611,16 @@ class Ced_Product_Importer_Admin
 	}
 
 	/**
-	 * ced_get_qty
+	 * Function : ced_get_qty
+	 * Description :  Fetching Purchased Quantity of Product for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
-	 * @return void
+	 * @var $qty
+	 * @return $qty
 	 */
-	public function ced_get_qty($data)
-	{
+	public function ced_get_qty( $data) {
 		foreach ($data as $elements => $element) {
 			$qty = $element['QuantityPurchased'];
 		}
@@ -636,12 +629,15 @@ class Ced_Product_Importer_Admin
 
 	/**
 	 * Function : fetch_shipping_address_for_order
+	 * Description :  Fetching Shipping Address for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
+	 * @var $shippingAddress
 	 * @return $shippingAddress
 	 */
-	public function ced_fetch_shipping_address_for_order($data)
-	{
+	public function ced_fetch_shipping_address_for_order( $data) {
 		$shippingAddress = array(
 			'first_name' => $data['Name'],
 			'address_1' => $data['Street1'],
@@ -653,14 +649,18 @@ class Ced_Product_Importer_Admin
 		return $shippingAddress;
 	}
 
-	
+
 	/**
-	 * ced_fetch_billing_address_for_order
+	 * Function :ced_fetch_billing_address_for_order
+	 * Description :  Fetching Billing Address for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
-	 * @return void
+	 * @var $billingAddress
+	 * @return $billingAddress
 	 */
-	public function ced_fetch_billing_address_for_order($data){
+	public function ced_fetch_billing_address_for_order( $data) {
 		$billingAddress = array(
 			'first_name' => $data['Name'],
 			'address_1' => $data['Street1'],
@@ -672,101 +672,155 @@ class Ced_Product_Importer_Admin
 		return $billingAddress;
 	}
 
-	
+
 	/**
-	 * ced_get_shipping_title
+	 * Function :ced_get_shipping_title
+	 * Description :  Fetching Shipping Title for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
-	 * @return void
+	 * @var $shippingMethodTitle
+	 * @return $shippingMethodTitle
 	 */
-	public function ced_get_shipping_title($data){
-		$shippingMethodTitle=$data['ShippingService'];
+	public function ced_get_shipping_title( $data) {
+		$shippingMethodTitle = $data['ShippingService'];
 		return $shippingMethodTitle;
 	}
 
-	
+
 	/**
-	 * ced_get_shipping_cost
+	 * Function : ced_get_shipping_cost
+	 * Description :  Fetching Shipping Cost for creation of new Order
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
 	 * @param  mixed $data
-	 * @return void
+	 * @var $shippingMethodCost
+	 * @return $shippingMethodCost
 	 */
-	public function ced_get_shipping_cost($data){
-		foreach($data as $elements=>$element){
-			$shippingMethodCost=$element['value'];
-			
+	public function ced_get_shipping_cost( $data) {
+		foreach ($data as $elements => $element) {
+			$shippingMethodCost = $element['value'];
 		}
 		return $shippingMethodCost;
 	}
 
 
-	// /**
-	//  * Function :ced_get_tax
-	//  *
-	//  * @param  mixed $data
-	//  * @return void
-	//  */
-	// public function fetch_total_tax_for_order($data){
-	// 	$tax_total='0';
-	// 	foreach($data as $elements=>$element){
-	// 	$tax_total=$element['Taxes']['TotalTaxAmount']['value'];
-	// 	}
-	// 	return $tax_total;
-	// }
+	/**
+	 * Function :ced_get_tax
+	 * Description :Fetching Tax Deatils(Name,Cost) for creation of new Order
+	 * Version:1.0.0
+	 *
+	 * @since    1.0.0
+	 * @param  mixed $data
+	 * @var $tax_details
+	 * @return $tax_details
+	 */
+	public function ced_get_tax_detail( $data) {
+		foreach ($data as $elements => $element) {
+			foreach ($element as $values => $value) {
+				foreach ($value as $key => $secondElement) {
+					foreach ($secondElement as $v => $lastElement) {
+						$tax_details = array(
+							'tax_name' => $lastElement['TaxDescription'],
+							'tax_amount' => $lastElement['TaxAmount']['value']
+						);
+					}
+				}
+			}
+		}
+		return $tax_details;
+	}
 
 
 	/**
 	 * Function :ced_create_order
+	 * Description : Creating a New Order  Using a JSON File
+	 * Version:1.0.0
 	 *
+	 * @since    1.0.0
+	 * @var $orderfileName
+	 * @var $upload
+	 * @var $upload_dir
+	 * @var $getFileDataForImport
+	 * @var $getOrderFileDataForImport
+	 * @var $products_to_add
+	 * @var $user_id
+	 * @var $args
+	 * @var $new_order
+	 * @var $sku
+	 * @var $id
+	 * @var $product
+	 * @var $shippingAddress
+	 * @var $billingAddress
+	 * @var $getShippingTitle
+	 * @var $getShippingCost
+	 * @var $getTaxfeeDetail
 	 * @return void
 	 */
-	public function ced_create_order()
-	{
+	public function ced_create_order() {
 		if (check_ajax_referer('verify-ajax-call', 'nonce')) {
-			$orderfileName             = isset($_POST['orderfilename']) ? sanitize_text_field($_POST['orderfilename']) : false;
-			$upload                   = wp_upload_dir();
-			$upload_dir               = $upload['basedir'];
-			$upload_dir               = $upload_dir . '/cedcommerce_order_file/' . $orderfileName;
+			global $wpdb;
+			$orderfileName                 = isset($_POST['orderfilename']) ? sanitize_text_field($_POST['orderfilename']) : false;
+			$upload                        = wp_upload_dir();
+			$upload_dir                    = $upload['basedir'];
+			$upload_dir                    = $upload_dir . '/cedcommerce_order_file/' . $orderfileName;
 			$getOrderFileDataForImport     = file_get_contents($upload_dir);
 			$decodedOrderFileDataForImport = json_decode($getOrderFileDataForImport, true);
-			$products_to_add = array();
+			$products_to_add               = array();
 			foreach ($decodedOrderFileDataForImport as $elements => $element) {
 				foreach ($element as $values => $value) {
 					foreach ($value as $data) {
-						$user_id=$data['BuyerUserID'];
-						$args = array(
-							'customer_id'   => $user_id,
-							'status'        => 'Processing',
-							'customer_note' => 'Your order is on Processing.',
-							'order_id'      => $data['OrderID'],
-						);
-						$new_order = wc_create_order($args);
-						$sku = $this->ced_get_sku($data['TransactionArray']['Transaction']);
-						$id = wc_get_product_id_by_sku($sku);
-						$product = wc_get_product($id);
-						if ($id) {
-							$products_to_add[$product->get_id()] = $this->ced_get_qty($data['TransactionArray']['Transaction']);
+						$user_id  = $data['BuyerUserID'];
+						$orderKey = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = %s", '_order_id_unique'));
+						if ($orderKey === $data['OrderID']) {
+							echo 'Order Already Exist';
 						} else {
-							//Create Product
+							$args      = array(
+								'customer_id'   => $user_id,
+								'status'        => 'Processing',
+								'customer_note' => 'Your order is on Processing.',
+								'order_id'      => $data['OrderID'],
+							);
+							$new_order = wc_create_order($args);
+							update_post_meta($new_order->ID, '_order_id_unique', $data['OrderID']);
+							$sku     = $this->ced_get_sku($data['TransactionArray']['Transaction']);
+							$id      = wc_get_product_id_by_sku($sku);
+							$product = wc_get_product($id);
+							if ($id) {
+								$products_to_add[$product->get_id()] = $this->ced_get_qty($data['TransactionArray']['Transaction']);
+							} else {
+								//Create Product
+							}
+							foreach ($products_to_add as $product => $qty) {
+								$new_order->add_product(wc_get_product($product), $qty);
+							}
+							$date_time        = new WC_DateTime();
+							$addShipping      = new WC_Order_Item_Shipping();
+							$addfee           = new WC_Order_Item_Fee();
+							$shippingAddress  = $this->ced_fetch_shipping_address_for_order($data['ShippingAddress']);
+							$billingAddress   = $this->ced_fetch_billing_address_for_order($data['ShippingAddress']);
+							$getShippingTitle = $this->ced_get_shipping_title($data['ShippingServiceSelected']);
+							$getShippingCost  = $this->ced_get_shipping_cost($data['ShippingServiceSelected']);
+							$getTaxfeeDetail  = $this->ced_get_tax_detail($data['TransactionArray']['Transaction']);
+							$new_order->set_date_created($date_time);
+							$new_order->set_address($shippingAddress, 'shipping');
+							$new_order->set_address($billingAddress, 'billing');
+							$new_order->set_currency($data['Total']['currencyID']);
+							$addShipping->set_method_title($getShippingTitle);
+							$addShipping->set_total($getShippingCost);
+							$new_order->add_item($addShipping); //Adding  shipping Detail To Order
+							$addfee->set_name($getTaxfeeDetail['tax_name']);
+							$addfee->set_amount($getTaxfeeDetail['tax_amount']);
+							$addfee->set_total($getTaxfeeDetail['tax_amount']);
+							$addfee->set_tax_class('');
+							$addfee->set_tax_status('taxable');
+							$new_order->add_item($addfee); // Adding  Tax fee to order
+							$new_order->calculate_totals();
+							$new_order->save();
+							echo 'Order Created Successfully';
 						}
-						foreach ($products_to_add as $product => $qty) {
-							$new_order->add_product(wc_get_product($product), $qty);
-						}
-						$date_time = new WC_DateTime();
-						$addShipping = new WC_Order_Item_Shipping();
-						$shippingAddress = $this->ced_fetch_shipping_address_for_order($data['ShippingAddress']);
-						$billingAddress=$this->ced_fetch_billing_address_for_order($data['ShippingAddress']);
-						$getShippingTitle=$this->ced_get_shipping_title($data['ShippingServiceSelected']);
-						$getShippingCost=$this->ced_get_shipping_cost($data['ShippingServiceSelected']);
-						$new_order->set_date_created($date_time);
-						$new_order->set_address($shippingAddress, 'shipping');
-						$new_order->set_address( $billingAddress, 'billing' );
-						$new_order->set_currency($data['Total']['currencyID']);
-						$addShipping->set_method_title($getShippingTitle);
-						$addShipping->set_total($getShippingCost);
-						$new_order->add_item($addShipping);
-						$new_order->calculate_totals();
-						$new_order->save();
 					}
 				}
 			}

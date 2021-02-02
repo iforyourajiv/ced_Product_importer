@@ -48,7 +48,7 @@ class Ced_Product_List extends WP_List_Table {
 	public function get_columns() {
 		$columns = [
 			'cb'      => '<input type="checkbox" />',
-			'images'   => __('Product Image','ced-product-importer'),
+			'images'   => __('Product Image', 'ced-product-importer'),
 			'name'     => __('Name'),
 			'item_sku' => __('SKU'),
 			'price' => __('Price'),
@@ -84,7 +84,7 @@ class Ced_Product_List extends WP_List_Table {
 		if ($product_id) {
 			$html = '<button class="button button-primary button-next">Already Imported</button>';
 		} else {
-			$html = "<a href='#' class='button".$id." button-primary button-next' id='import_product'  data-productId='$id'>Import</a>";
+			$html = "<a href='#' class='button" . $id . " button-primary button-next' id='import_product'  data-productId='$id'>Import</a>";
 		}
 		switch ($column_name) {
 			case 'images':
